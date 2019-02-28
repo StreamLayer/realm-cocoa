@@ -5,6 +5,8 @@ x.y.z Release notes (yyyy-MM-dd)
   which checks if a local Realm file exists for the given configuration.
 * Add `-[RLMRealm deleteFilesForConfiguration:]`/`Realm.deleteFiles(for:)`
   to delete the Realm file and all auxiliary files for the given configuration.
+* Add the ability to set a custom logger function on `RLMSyncManager` which is
+  called instead of the default NSLog-based logger.
 
 ### Fixed
 * Fix a rare crash in `ClientHistoryImpl::integrate_server_changesets()` which
