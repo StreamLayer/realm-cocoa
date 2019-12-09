@@ -7,8 +7,8 @@ x.y.z Release notes (yyyy-MM-dd)
   to delete the Realm file and all auxiliary files for the given configuration.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+* Fix a rare crash in `ClientHistoryImpl::integrate_server_changesets()` which
+  would only happen in Debug builds (since v3.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -19,8 +19,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.2.1.
 
 ### Internal
-Upgraded realm-core from ? to ?
-Upgraded realm-sync from ? to ?
+* Upgraded realm-core from ? to ?
+* Upgraded realm-sync from 4.8.2 to 4.9.0.
 
 4.1.1 Release notes (2019-11-18)
 =============================================================
