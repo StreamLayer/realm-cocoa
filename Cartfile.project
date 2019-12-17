@@ -1,0 +1,14 @@
+RealmSwift:
+  project: Realm.xcodeproj
+  sdks:
+  - iphonesimulator
+  - iphoneos
+  - appletvos
+  - appletvsimulator
+Realm:
+  project: Realm.xcodeproj
+  sdks:
+  - iphoneos
+  - iphonesimulator
+  - appletvos
+  - appletvsimulator

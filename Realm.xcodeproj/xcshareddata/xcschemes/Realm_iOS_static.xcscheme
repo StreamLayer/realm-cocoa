@@ -16,7 +16,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "5DD7557B1BE056DE002800DA"
                BuildableName = "Realm.framework"
-               BlueprintName = "Realm iOS static"
+               BlueprintName = "Realm_iOS_static"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,7 +46,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5DD7557B1BE056DE002800DA"
             BuildableName = "Realm.framework"
-            BlueprintName = "Realm iOS static"
+            BlueprintName = "Realm_iOS_static"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -86,7 +86,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5DD7557B1BE056DE002800DA"
             BuildableName = "Realm.framework"
-            BlueprintName = "Realm iOS static"
+            BlueprintName = "Realm_iOS_static"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -102,7 +102,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5DD7557B1BE056DE002800DA"
             BuildableName = "Realm.framework"
-            BlueprintName = "Realm iOS static"
+            BlueprintName = "Realm_iOS_static"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
