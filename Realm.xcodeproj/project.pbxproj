@@ -966,6 +966,7 @@
 		C2CAAE751E9BB5760025454C /* system_configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = system_configuration.cpp; sourceTree = "<group>"; };
 		C2CAAE761E9BB5760025454C /* system_configuration.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = system_configuration.hpp; sourceTree = "<group>"; };
 		D8E1EF2C23A8BB9E00083A08 /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D8E1EF3623AA7AE400083A08 /* RealmSwift static.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "RealmSwift static.xcconfig"; sourceTree = "<group>"; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		E81A1F631955FC9300FDED82 /* RLMAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccessor.h; sourceTree = "<group>"; };
 		E81A1F641955FC9300FDED82 /* RLMAccessor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAccessor.mm; sourceTree = "<group>"; };
@@ -1382,6 +1383,7 @@
 		5D660FBA1BE98BD80021E04F /* RealmSwift */ = {
 			isa = PBXGroup;
 			children = (
+				D8E1EF3623AA7AE400083A08 /* RealmSwift static.xcconfig */,
 				5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */,
 				5D660FC01BE98BEF0021E04F /* Tests.xcconfig */,
 			);
@@ -3035,10 +3037,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E761BE03E0D006515A0 /* Realm.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -3046,7 +3046,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E761BE03E0D006515A0 /* Realm.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 			};
@@ -3056,6 +3055,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
+				REALM_OBJC_MACH_O_TYPE = mh_dylib;
+				REALM_PLATFORM_SUFFIX = "$(PLATFORM_NAME)";
 			};
 			name = Debug;
 		};
@@ -3063,6 +3064,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
+				REALM_OBJC_MACH_O_TYPE = mh_dylib;
+				REALM_PLATFORM_SUFFIX = "$(PLATFORM_NAME)";
 			};
 			name = Release;
 		};
@@ -3096,6 +3099,7 @@
 			baseConfigurationReference = 5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
+				REALM_OBJC_MACH_O_TYPE = staticlib;
 			};
 			name = Debug;
 		};
@@ -3104,6 +3108,7 @@
 			baseConfigurationReference = 5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
+				REALM_OBJC_MACH_O_TYPE = staticlib;
 			};
 			name = Release;
 		};
@@ -3127,23 +3132,26 @@
 		};
 		D8E1EF2A23A8BB9E00083A08 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
+			baseConfigurationReference = D8E1EF3623AA7AE400083A08 /* RealmSwift static.xcconfig */;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 3.21.0;
-				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
-				MACH_O_TYPE = staticlib;
+				CLANG_ENABLE_MODULE_DEBUGGING = NO;
+				EXECUTABLE_NAME = RealmSwift;
 				PRODUCT_NAME = RealmSwift;
+				REALM_OBJC_MACH_O_TYPE = staticlib;
+				REALM_PLATFORM_SUFFIX = "$(PLATFORM_NAME)";
 			};
 			name = Debug;
 		};
 		D8E1EF2B23A8BB9E00083A08 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
+			baseConfigurationReference = D8E1EF3623AA7AE400083A08 /* RealmSwift static.xcconfig */;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 3.21.0;
-				INFOPLIST_FILE = "RealmSwift/RealmSwift-Info.plist";
-				MACH_O_TYPE = staticlib;
+				CLANG_ENABLE_MODULE_DEBUGGING = NO;
+				EXECUTABLE_NAME = RealmSwift;
+				LD_RUNPATH_SEARCH_PATHS = "";
 				PRODUCT_NAME = RealmSwift;
+				REALM_OBJC_MACH_O_TYPE = staticlib;
+				REALM_PLATFORM_SUFFIX = "$(PLATFORM_NAME)";
 			};
 			name = Release;
 		};
