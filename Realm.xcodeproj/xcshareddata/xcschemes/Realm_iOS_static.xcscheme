@@ -112,6 +112,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "Realm"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

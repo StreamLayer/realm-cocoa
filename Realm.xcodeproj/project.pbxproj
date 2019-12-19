@@ -947,7 +947,7 @@
 		5DAD37231F73220C00EECA8E /* sync-1.x.realm */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sync-1.x.realm"; path = "Realm/ObjectServerTests/sync-1.x.realm"; sourceTree = "<group>"; };
 		5DAD372D1F7485BB00EECA8E /* sync_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sync_config.cpp; path = sync/sync_config.cpp; sourceTree = "<group>"; };
 		5DB591A61D063DF8001D8F93 /* atomic_shared_ptr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = atomic_shared_ptr.hpp; sourceTree = "<group>"; };
-		5DD755CF1BE056DE002800DA /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5DD755CF1BE056DE002800DA /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5DD755E01BE05C19002800DA /* Tests.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
 		5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Tests iOS static.xcconfig"; sourceTree = "<group>"; };
 		5DEAA36420212AEF0024A6BE /* work_queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = work_queue.cpp; path = sync/impl/work_queue.cpp; sourceTree = "<group>"; };
@@ -3037,8 +3037,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E761BE03E0D006515A0 /* Realm.xcconfig */;
 			buildSettings = {
-				DEFINES_MODULE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 			};
 			name = Debug;
 		};
@@ -3046,8 +3044,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E761BE03E0D006515A0 /* Realm.xcconfig */;
 			buildSettings = {
-				DEFINES_MODULE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 			};
 			name = Release;
 		};
@@ -3055,7 +3051,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
-				REALM_OBJC_MACH_O_TYPE = mh_dylib;
 				REALM_PLATFORM_SUFFIX = "$(PLATFORM_NAME)";
 			};
 			name = Debug;
@@ -3064,7 +3059,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
-				REALM_OBJC_MACH_O_TYPE = mh_dylib;
 				REALM_PLATFORM_SUFFIX = "$(PLATFORM_NAME)";
 			};
 			name = Release;
@@ -3099,7 +3093,6 @@
 			baseConfigurationReference = 5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
-				REALM_OBJC_MACH_O_TYPE = staticlib;
 			};
 			name = Debug;
 		};
@@ -3108,7 +3101,6 @@
 			baseConfigurationReference = 5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
-				REALM_OBJC_MACH_O_TYPE = staticlib;
 			};
 			name = Release;
 		};
@@ -3136,8 +3128,6 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
 				EXECUTABLE_NAME = RealmSwift;
-				PRODUCT_NAME = RealmSwift;
-				REALM_OBJC_MACH_O_TYPE = staticlib;
 				REALM_PLATFORM_SUFFIX = "$(PLATFORM_NAME)";
 			};
 			name = Debug;
@@ -3148,9 +3138,6 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
 				EXECUTABLE_NAME = RealmSwift;
-				LD_RUNPATH_SEARCH_PATHS = "";
-				PRODUCT_NAME = RealmSwift;
-				REALM_OBJC_MACH_O_TYPE = staticlib;
 				REALM_PLATFORM_SUFFIX = "$(PLATFORM_NAME)";
 			};
 			name = Release;

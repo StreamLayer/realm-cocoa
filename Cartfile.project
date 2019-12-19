@@ -1,10 +1,15 @@
-RealmSwift_static:
+Realm_iOS_static:
   project: Realm.xcodeproj
   sdks:
-  - macosx
   - iphonesimulator
   - iphoneos
   - appletvos
   - appletvsimulator
-  - watchos
-  - watchsimulator
+
+RealmSwift_static:
+  project: Realm.xcodeproj
+  sdks:
+  - iphonesimulator
+  - iphoneos
+  - appletvos
+  - appletvsimulator

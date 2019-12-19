@@ -1,11 +1,11 @@
 #include "Realm.xcconfig"
 
-// SUPPORTED_PLATFORMS = macosx iphoneos iphonesimulator watchos watchsimulator appletvos appletvsimulator;
-// TARGETED_DEVICE_FAMILY = 1,2,3,4;
-// IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+SUPPORTED_PLATFORMS = iphoneos iphonesimulator appletvos appletvsimulator;
+IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+TVOS_DEPLOYMENT_TARGET = 11.0;
+TARGETED_DEVICE_FAMILY = 1,2,3;
 
-MACH_O_TYPE = staticlib;
-EXECUTABLE_NAME = Realm;
-
-CONFIGURATION_BUILD_DIR = $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static;
-CONFIGURATION_TEMP_DIR = $(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static;
+REALM_OBJC_MACH_O_TYPE = staticlib
+MACH_O_TYPE = staticlib
+EXECUTABLE_NAME = Realm
+PRODUCT_TYPE = com.apple.product-type.framework
