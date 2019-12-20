@@ -439,6 +439,9 @@
 		C2CAAE771E9BB5760025454C /* system_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2CAAE751E9BB5760025454C /* system_configuration.cpp */; };
 		C2CAAE781E9BB5760025454C /* system_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2CAAE751E9BB5760025454C /* system_configuration.cpp */; };
 		C2CAAE7A1E9BB5760025454C /* system_configuration.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C2CAAE761E9BB5760025454C /* system_configuration.hpp */; };
+		D871B0CD23AC43BB006A6FE1 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A7B82391D51259F00750296 /* libz.tbd */; };
+		D871B0CE23AC43C0006A6FE1 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F9816292317763000C3543D /* libc++.tbd */; };
+		D871B0D023AC43F0006A6FE1 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A7B82391D51259F00750296 /* libz.tbd */; };
 		D8E1EF0E23A8BB9E00083A08 /* Aliases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FE31BE98D670021E04F /* Aliases.swift */; };
 		D8E1EF0F23A8BB9E00083A08 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B7FDF51C0DA6560023224E /* Error.swift */; };
 		D8E1EF1023A8BB9E00083A08 /* LinkingObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1534B71CCFF545008976D7 /* LinkingObjects.swift */; };
@@ -1091,10 +1094,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D871B0CF23AC43E3006A6FE1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D871B0D023AC43F0006A6FE1 /* libz.tbd in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D8E1EF2323A8BB9E00083A08 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D871B0CE23AC43C0006A6FE1 /* libc++.tbd in Frameworks */,
+				D871B0CD23AC43BB006A6FE1 /* libz.tbd in Frameworks */,
 				D8E1EF3523A932B100083A08 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2025,6 +2038,7 @@
 				5D659E7E1BE04556006515A0 /* Get Version Number */,
 				5D6156F41BE06FF500A4BD3F /* Generate RLMPlatform.h */,
 				5DD7557E1BE056DE002800DA /* Sources */,
+				D871B0CF23AC43E3006A6FE1 /* Frameworks */,
 				5DD7559D1BE056DE002800DA /* Headers */,
 			);
 			buildRules = (

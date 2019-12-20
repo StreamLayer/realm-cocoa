@@ -10,3 +10,6 @@ DEFINES_MODULE = YES;
 INFOPLIST_FILE = RealmSwift/RealmSwift-Info.plist;
 PRODUCT_NAME = RealmSwift;
 PRODUCT_BUNDLE_IDENTIFIER = io.realm.RealmSwift;
+
+OTHER_LDFLAGS[sdk=iphone*] = -ObjC -all_load -l"z" -l"c++";
+OTHER_LDFLAGS[sdk=appletv*] = -ObjC -all_load -l"z" -l"c++";

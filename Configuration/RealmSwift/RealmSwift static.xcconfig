@@ -9,3 +9,4 @@ REALM_OBJC_MACH_O_TYPE = staticlib
 MACH_O_TYPE = staticlib
 EXECUTABLE_NAME = RealmSwift
 PRODUCT_TYPE = com.apple.product-type.framework
+DEBUG_INFORMATION_FORMAT = dwarf
