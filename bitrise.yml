@@ -1,0 +1,20 @@
+---
+format_version: '6'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: ios
+
+workflows:
+  deploy:
+    steps:
+    - script:
+        deps:
+          brew:
+          - name: node
+          - name: streamlayer/formulas/carthage
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -ex
+
+            yarn
+            yarn semantic-release
