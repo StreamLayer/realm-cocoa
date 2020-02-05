@@ -8,7 +8,7 @@
       "preset": "angular"
     }],
     ["@semantic-release/exec", {
-      "prepareCmd": "carthage build --toolchain org.swift.50120190418a --commitish v${nextRelease.version} --cache-builds --archive --archive-output Realm.framework.zip"
+      "prepareCmd": "carthage build --commitish v${nextRelease.version} --cache-builds --archive --archive-output Realm.framework.zip"
     }],
     ["@semantic-release/git", {
       "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
