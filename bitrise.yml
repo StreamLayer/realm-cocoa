@@ -16,5 +16,6 @@ workflows:
             #!/bin/bash
             set -ex
 
+            rm -rf Carthage
             yarn
             yarn semantic-release
