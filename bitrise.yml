@@ -16,5 +16,15 @@ workflows:
             #!/bin/bash
             set -ex
 
+            if [ "${BITRISE_GIT_BRANCH}" == "master" ]; then
+              target_version="5.1.3+d6c4ba50e84722a815542bda2b6e8a42"
+            elif [ "${BITRISE_GIT_BRANCH}" == "5.0.1-swift" ]; then
+              target_version="5.0.1+6b0f2c1677afd7b6095cfee3524e116c"
+            fi
+
+            if [ x"$(carthage swift-version)" != x"${target_version}" ]; then
+              fail "invalid swift version"
+            fi
+
             yarn
             yarn semantic-release
