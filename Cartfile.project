@@ -1,4 +1,4 @@
-Realm_iOS_static:
+Realm:
   project: Realm.xcodeproj
   sdks:
   - iphonesimulator
@@ -6,7 +6,7 @@ Realm_iOS_static:
   - appletvos
   - appletvsimulator
 
-RealmSwift_static:
+RealmSwift:
   project: Realm.xcodeproj
   sdks:
   - iphonesimulator
