@@ -1,4 +1,4 @@
-Realm_iOS:
+Realm:
   project: Realm.xcodeproj
   sdks:
   - iphonesimulator
