@@ -28,5 +28,6 @@ workflows:
               fail "invalid swift version"
             fi
 
+            rm -rf Carthage
             yarn
             yarn semantic-release

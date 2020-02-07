@@ -13,3 +13,6 @@ PRODUCT_BUNDLE_IDENTIFIER = io.realm.RealmSwift;
 
 OTHER_LDFLAGS[sdk=iphone*] = -ObjC -all_load -l"z" -l"c++";
 OTHER_LDFLAGS[sdk=appletv*] = -ObjC -all_load -l"z" -l"c++";
+
+DEBUG_INFORMATION_FORMAT = dwarf
+CLANG_ENABLE_MODULE_DEBUGGING = NO
