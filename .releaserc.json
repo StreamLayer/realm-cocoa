@@ -2,7 +2,9 @@
   "branches": [
     "master",
     "3.x.x",
-    {"name": "5.0.1-swift", "prerelease": true}],
+    {"name": "5.0.1-swift", "prerelease": true},
+    {"name": "xcode-12.1", "prerelease": true}
+  ],
   "plugins": [
     ["@semantic-release/commit-analyzer", {
       "preset": "angular"
