@@ -33,12 +33,6 @@ workflows:
 
               brew rm carthage --force || true
               brew install nsoperations/formulas/carthage
-
-              # prepare env
-              gem uninstall bundler --force
-              gem install bundler --force
-              bundle install
-
               yarn --frozen-lockfile --check-files --prefer-offline
 
   _xcode:
