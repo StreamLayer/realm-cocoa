@@ -1,6 +1,6 @@
 {
   "name": "@streamlayer/realm-cocoa",
-  "version": "3.23.2",
+  "version": "3.23.3",
   "private": true,
   "devDependencies": {
     "@semantic-release/exec": "^5.0.0",
