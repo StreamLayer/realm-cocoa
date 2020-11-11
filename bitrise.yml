@@ -3,33 +3,153 @@ format_version: '6'
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: ios
 
+trigger_map:
+- tag: v*.*.*
+  workflow: schedule-stacks
+- push_branch: next
+  workflow: deploy
+
 workflows:
-  deploy:
+  _clone_repo:
+    steps:
+    - activate-ssh-key:
+        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | ne ""}}'
+    - git-clone: {}
+
+  _prepare_xcode:
+    before_run:
+    - _clone_repo
     steps:
     - script:
         deps:
           brew:
-          - name: node
-          - name: streamlayer/formulas/carthage
+          - name: node@14
+          - name: yarn
+        run_if: .IsCI
+        inputs:
+          - content: |-
+              #!/bin/bash
+              set -ex
+
+              brew rm carthage --force || true
+              brew install nsoperations/formulas/carthage
+
+              # prepare env
+              gem uninstall bundler --force
+              gem install bundler --force
+              bundle install
+
+              yarn --frozen-lockfile --check-files --prefer-offline
+
+  _xcode:
+    envs:
+    - artifact: Realm.framework.zip
+    - owner: StreamLayer
+    - repo: realm-cocoa
+    before_run:
+      - _prepare_xcode
+    steps:
+    - script:
+        deps:
+          brew:
+          - name: gh
         inputs:
         - content: |-
             #!/bin/bash
             set -ex
 
-            branch=${BITRISE_GIT_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}
-
-            if [ "${branch}" == "3.x.x" ]; then
-              target_version="5.1.3+d6c4ba50e84722a815542bda2b6e8a42"
-            elif [ "${branch}" == "5.0.1-swift" ]; then
-              target_version="5.0.1+6b0f2c1677afd7b6095cfee3524e116c"
-            elif [ "${branch}" == "xcode-12.1" ]; then
-              target_version="5.3+df4651b6117805e4aa1fc1bc0670304e"
+            if [ "$(carthage swift-version)" != "${EXPECTED_SWIFT}" ]; then
+              echo "Invalid swift version" 1>&2
+              exit 1
             fi
 
-            if [ x"$(carthage swift-version)" != x"${target_version}" ]; then
-              fail "invalid swift version"
-            fi
+            # ensure its the latest version
+            git fetch
+            git checkout v$RELEASE_VERSION
 
-            rm -rf Carthage
-            yarn
+            swift_version=`echo ${EXPECTED_SWIFT} | awk -F+ '{print $1}'`
+            # additional release tag
+            # format of x.x.x-x.x.x
+            RELEASE_TAG=${RELEASE_VERSION}-${swift_version}
+
+            # clean possible cache
+            rm -rf Carthage/Build
+
+            make carthage_project
+            carthage bootstrap
+            carthage build --commitish $RELEASE_TAG --cache-builds --archive --archive-output $artifact
+
+            git add .
+            git commit --allow-empty -m "[skip ci] chore: created ${RELEASE_TAG} artifacts"
+
+            git tag $RELEASE_TAG
+            git remote set-url origin https://${owner}:${GH_TOKEN}@github.com/${owner}/${repo}.git
+            git push origin refs/tags/${RELEASE_TAG}
+
+            # find latest release
+            ./node_modules/.bin/github-release upload \
+              --owner $owner --repo $repo --token $GH_TOKEN --tag $RELEASE_TAG --prerelease true \
+              $artifact
+
+  # trigger xcode 12.1 build
+  xcode_113:
+    meta:
+      bitrise.io:
+        stack: osx-xcode-11.3.x
+    envs:
+    - EXPECTED_SWIFT: 5.1.3+d6c4ba50e84722a815542bda2b6e8a42
+    after_run:
+    - _xcode
+
+  # trigger xcode 12.1 build
+  xcode_121:
+    meta:
+      bitrise.io:
+        stack: osx-xcode-12.1.x
+    envs:
+    - EXPECTED_SWIFT: 5.3+df4651b6117805e4aa1fc1bc0670304e
+    after_run:
+    - _xcode
+
+  schedule-stacks:
+    meta:
+      bitrise.io:
+        stack: osx-xcode-12.1.x
+    description: |-
+      after initial assets were generated schedule 3 builds, which will create appropriate
+      artifacts for respected platforms
+    before_run:
+    - _prepare_xcode
+    steps:
+    - script:
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -ex
+            release=`node -e "process.stdout.write(require('./package.json').version)"`
+            envman add --key RELEASE_VERSION --value ${release}
+
+    - build-router-start:
+        inputs:
+        - workflows: xcode_113
+        - wait_for_builds: 'false'
+        - access_token: "$BITRISE_ACCESS_TOKEN"
+        - environment_key_list: "RELEASE_VERSION\n"
+
+    - build-router-start:
+        inputs:
+        - workflows: xcode_121
+        - wait_for_builds: 'false'
+        - access_token: "$BITRISE_ACCESS_TOKEN"
+        - environment_key_list: "RELEASE_VERSION\n"
+
+  deploy:
+    before_run:
+    - _prepare_xcode
+    steps:
+    - script:
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -ex
             yarn semantic-release

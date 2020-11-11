@@ -1,28 +1,19 @@
 {
   "branches": [
     "master",
-    "3.x.x",
-    {"name": "5.0.1-swift", "prerelease": true},
-    {"name": "xcode-12.1", "prerelease": true}
+    "3.x.x"
   ],
   "plugins": [
     ["@semantic-release/commit-analyzer", {
       "preset": "angular"
     }],
-    ["@semantic-release/exec", {
-      "prepareCmd": "carthage build --commitish v${nextRelease.version} --cache-builds --archive --archive-output Realm.framework.zip"
-    }],
     ["@semantic-release/npm", {
       "npmPublish": false
     }],
     ["@semantic-release/git", {
-      "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
+      "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}",
       "assets": ["package.json"]
     }],
-    ["@semantic-release/github", {
-      "assets": [
-        { "path": "Realm.framework.zip" }
-      ]
-    }]
+    ["@semantic-release/github"]
   ]
 }
