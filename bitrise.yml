@@ -69,7 +69,6 @@ workflows:
             # clean possible cache
             rm -rf Carthage/Build
 
-            make carthage_project
             carthage bootstrap
             carthage build --commitish $RELEASE_TAG --cache-builds --archive --archive-output $artifact
 
