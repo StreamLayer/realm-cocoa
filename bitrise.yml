@@ -58,7 +58,7 @@ workflows:
             fi
 
             # ensure its the latest version
-            git fetch
+            git -c protocol.version=2 submodule update --init --recursive
             git checkout v$RELEASE_VERSION
 
             swift_version=`echo ${EXPECTED_SWIFT} | awk -F+ '{print $1}'`
