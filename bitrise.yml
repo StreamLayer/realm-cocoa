@@ -6,7 +6,7 @@ project_type: ios
 trigger_map:
 - tag: v*.*.*
   workflow: schedule-stacks
-- push_branch: next
+- push_branch: 3.x.x
   workflow: deploy
 
 workflows:
