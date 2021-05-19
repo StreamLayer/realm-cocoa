@@ -64,6 +64,7 @@ workflows:
 
             # ensure its the latest version
             git -c protocol.version=2 submodule update --init --recursive
+            git fetch --all
             git checkout v$RELEASE_VERSION
 
             swift_version=`echo ${EXPECTED_SWIFT} | awk -F+ '{print $1}'`
@@ -105,7 +106,7 @@ workflows:
       bitrise.io:
         stack: osx-xcode-12.5.x
     description: |-
-      after initial assets were generated schedule 3 builds, which will create appropriate
+      after initial assets were generated schedule different builds, which will create appropriate
       artifacts for respected platforms
     before_run:
     - _prepare_xcode
