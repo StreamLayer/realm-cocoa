@@ -32,7 +32,12 @@ workflows:
               set -ex
 
               brew rm carthage --force || true
-              brew install nsoperations/formulas/carthage
+
+              curl -o carthage.zip https://codeload.github.com/nsoperations/Carthage/zip/refs/tags/0.46.1%2Bnsoperations
+              unzip carthage.zip
+              cd Carthage-0.46.1-nsoperations
+              make install
+
               yarn --frozen-lockfile --check-files --prefer-offline
 
   _xcode:
@@ -84,30 +89,21 @@ workflows:
               --owner $owner --repo $repo --token $GH_TOKEN --tag $RELEASE_TAG --prerelease true \
               $artifact
 
-  # trigger xcode 12.4 build
-  xcode_124:
+  # trigger xcode 12.5 build
+  xcode_125:
     meta:
       bitrise.io:
-        stack: osx-xcode-12.4.x
+        stack: osx-xcode-12.5.x
     envs:
-    - EXPECTED_SWIFT: 5.3.2+161bc4399f7fbcf26178ad0e509b2057
+    - EXPECTED_SWIFT: 5.4+383060f95aa8db511b18dca4d5690966
     after_run:
     - _xcode
 
-  # trigger xcode 12.1 build
-  xcode_121:
-    meta:
-      bitrise.io:
-        stack: osx-xcode-12.1.x
-    envs:
-    - EXPECTED_SWIFT: 5.3+df4651b6117805e4aa1fc1bc0670304e
-    after_run:
-    - _xcode
 
   schedule-stacks:
     meta:
       bitrise.io:
-        stack: osx-xcode-12.1.x
+        stack: osx-xcode-12.5.x
     description: |-
       after initial assets were generated schedule 3 builds, which will create appropriate
       artifacts for respected platforms
@@ -124,17 +120,11 @@ workflows:
 
     - build-router-start:
         inputs:
-        - workflows: xcode_124
+        - workflows: xcode_125
         - wait_for_builds: 'false'
         - access_token: "$BITRISE_ACCESS_TOKEN"
         - environment_key_list: "RELEASE_VERSION\n"
 
-    - build-router-start:
-        inputs:
-        - workflows: xcode_121
-        - wait_for_builds: 'false'
-        - access_token: "$BITRISE_ACCESS_TOKEN"
-        - environment_key_list: "RELEASE_VERSION\n"
 
   deploy:
     before_run:
