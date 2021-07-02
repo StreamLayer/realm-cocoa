@@ -100,16 +100,21 @@ workflows:
     after_run:
     - _xcode
 
-
-  schedule-stacks:
+  # trigger xcode 12.4 build
+  xcode_124:
     meta:
       bitrise.io:
-        stack: osx-xcode-12.5.x
+        stack: osx-xcode-12.4.x
+    envs:
+    - EXPECTED_SWIFT: 5.3.2+161bc4399f7fbcf26178ad0e509b2057
+    after_run:
+    - _xcode
+
+
+  schedule-stacks:
     description: |-
       after initial assets were generated schedule different builds, which will create appropriate
       artifacts for respected platforms
-    before_run:
-    - _prepare_xcode
     steps:
     - script:
         inputs:
