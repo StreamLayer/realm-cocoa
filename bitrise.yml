@@ -115,6 +115,8 @@ workflows:
     description: |-
       after initial assets were generated schedule different builds, which will create appropriate
       artifacts for respected platforms
+    before_run:
+    - _prepare_xcode
     steps:
     - script:
         inputs:
