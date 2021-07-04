@@ -133,6 +133,13 @@ workflows:
         - access_token: "$BITRISE_ACCESS_TOKEN"
         - environment_key_list: "RELEASE_VERSION\n"
 
+    - build-router-start:
+        inputs:
+        - workflows: xcode_124
+        - wait_for_builds: 'false'
+        - access_token: "$BITRISE_ACCESS_TOKEN"
+        - environment_key_list: "RELEASE_VERSION\n"
+
 
   deploy:
     before_run:
