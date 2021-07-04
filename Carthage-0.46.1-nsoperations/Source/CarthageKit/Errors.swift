@@ -1,0 +1,452 @@
+import Foundation
+import ReactiveSwift
+import ReactiveTask
+import Tentacle
+import XCDBLD
+
+/// Possible errors that can originate from Carthage.
+public enum CarthageError: Error {
+    public typealias VersionRequirement = (specifier: VersionSpecifier, fromDependency: Dependency?)
+
+    public struct DuplicatesInArchive: Equatable {
+        let dictionary: [URL: [URL]]
+    }
+
+    /// One or more arguments was invalid.
+    case invalidArgument(description: String)
+
+    /// `xcodebuild` did not return a build setting that we needed.
+    case missingBuildSetting(String)
+
+    /// Incompatible version specifiers were given for a dependency.
+    case incompatibleRequirements(Dependency, VersionRequirement, VersionRequirement)
+
+    /// No tagged versions could be found for the dependency.
+    case taggedVersionNotFound(Dependency)
+
+    /// No existent version could be found to satisfy the version specifier for
+    /// a dependency.
+    case requiredVersionNotFound(Dependency, VersionSpecifier)
+
+    /// No valid versions could be found, given the list of dependencies to update
+    case unsatisfiableDependencyList([String])
+
+    /// No entry could be found in Cartfile for a dependency with this name.
+    case unknownDependencies([String])
+
+    /// No entry could be found in Cartfile.resolved for a dependency with this name.
+    case unresolvedDependencies([String])
+
+    /// Conflicting dependencies, e.g. dependencies with the same name for which no definite resolution can be made.
+    case incompatibleDependencies([Dependency])
+
+    /// Failed to check out a repository.
+    case repositoryCheckoutFailed(workingDirectoryURL: URL, reason: String, underlyingError: NSError?)
+
+    /// Failed to read a file or directory at the given URL.
+    case readFailed(URL, NSError?)
+
+    /// Failed to write a file or directory at the given URL.
+    case writeFailed(URL, NSError?)
+
+    /// No available simulators could be found
+    case noAvailableSimulators(platformName: String)
+
+    /// An error occurred parsing a Carthage file or task result
+    case parseError(description: String)
+
+    /// An error occurred parsing the binary-only framework definition file
+    case invalidBinaryJSON(URL, BinaryJSONError)
+
+    /// An expected environment variable wasn't found.
+    case missingEnvironmentVariable(variable: String)
+
+    /// An error occurred reading a framework's architectures.
+    case invalidArchitectures(description: String)
+
+    /// An error occurred reading a dSYM or framework's UUIDs.
+    case invalidUUIDs(description: String)
+
+    /// The framework at the specified URL was not valid
+    case invalidFramework(URL, description: String)
+
+    /// The symbols (dsym) at the specified url were not valid
+    case invalidDebugSymbols(URL, description: String)
+
+    /// The project is not sharing any framework schemes, so Carthage cannot
+    /// discover them.
+    case noSharedFrameworkSchemes(Dependency, Set<Platform>)
+
+    /// The project is not sharing any schemes, so Carthage cannot discover
+    /// them.
+    case noSharedSchemes(ProjectLocator, (Server, Repository)?)
+
+    /// Timeout whilst running `xcodebuild`
+    case xcodebuildTimeout(ProjectLocator)
+
+    /// A cartfile contains duplicate dependencies, either in itself or across
+    /// other cartfiles.
+    case duplicateDependencies([DuplicateDependency])
+
+    /// There was a cycle between dependencies in the associated graph.
+    case dependencyCycle([Dependency])
+
+    /// A request to the GitHub API failed.
+    case gitHubAPIRequestFailed(Client.Error)
+
+    /// GitHub API timeout failure
+    case gitHubAPITimeout
+
+    /// Build failure
+    case buildFailed(TaskError, log: URL?)
+
+    /// Unknown or unparsable Swift version of framework
+    case unknownFrameworkSwiftVersion(String)
+
+    /// Incompatible Swift version for framework
+    case incompatibleFrameworkSwiftVersion(String)
+
+    /// An error occurred while shelling out.
+    case taskError(TaskError)
+
+    /// An internal error occurred
+    case internalError(description: String)
+
+    /// Cartfile.resolved contains incompatible versions
+    case invalidResolvedCartfile([CompatibilityInfo])
+
+    /// Error acquiring file system lock within the specified timeout
+    case lockError(url: URL, timeout: Int?)
+
+    /// An archive (.zip, .gz, .bz2 ...) contains binaries that would
+    /// be copied to the same destination path
+    case duplicatesInArchive(duplicates: DuplicatesInArchive)
+
+    /// No binary could be found to install in the binary archive
+    case noInstallableBinariesFoundInArchive(dependency: Dependency)
+
+    /// HTTP error occured, non-successful status code
+    case httpError(statusCode: Int)
+    
+    case bootstrapNeeded
+}
+
+extension CarthageError {
+    public init(scannableError: ScannableError) {
+        self = .parseError(description: "\(scannableError)")
+    }
+    
+    static func assertionError(file: String = #file, line: Int = #line, description: String) -> CarthageError {
+        return CarthageError.internalError(description: "Assertion failed in file \(file) line #\(line): \(description)")
+    }
+}
+
+private func == (_ lhs: CarthageError.VersionRequirement, _ rhs: CarthageError.VersionRequirement) -> Bool {
+    return lhs.specifier == rhs.specifier && lhs.fromDependency == rhs.fromDependency
+}
+
+extension CarthageError: Equatable {
+    public static func == (_ lhs: CarthageError, _ rhs: CarthageError) -> Bool { // swiftlint:disable:this cyclomatic_complexity function_body_length
+        switch (lhs, rhs) {
+        case let (.invalidArgument(left), .invalidArgument(right)):
+            return left == right
+
+        case let (.missingBuildSetting(left), .missingBuildSetting(right)):
+            return left == right
+
+        case let (.incompatibleRequirements(left, la, lb), .incompatibleRequirements(right, ra, rb)):
+            let specifiersEqual = (la == ra && lb == rb) || (la == rb && rb == la)
+            return left == right && specifiersEqual
+
+        case let (.taggedVersionNotFound(left), .taggedVersionNotFound(right)):
+            return left == right
+
+        case let (.requiredVersionNotFound(left, leftVersion), .requiredVersionNotFound(right, rightVersion)):
+            return left == right && leftVersion == rightVersion
+
+        case let (.unsatisfiableDependencyList(left), .unsatisfiableDependencyList(right)):
+            return left == right
+
+        case let (.repositoryCheckoutFailed(la, lb, lc), .repositoryCheckoutFailed(ra, rb, rc)):
+            return la == ra && lb == rb && lc == rc
+
+        case let (.readFailed(la, lb), .readFailed(ra, rb)):
+            return la == ra && lb == rb
+
+        case let (.writeFailed(la, lb), .writeFailed(ra, rb)):
+            return la == ra && lb == rb
+
+        case let (.parseError(left), .parseError(right)):
+            return left == right
+
+        case let (.invalidBinaryJSON(leftUrl, leftError), .invalidBinaryJSON(rightUrl, rightError)):
+            return leftUrl == rightUrl && leftError == rightError
+
+        case let (.missingEnvironmentVariable(left), .missingEnvironmentVariable(right)):
+            return left == right
+
+        case let (.invalidArchitectures(left), .invalidArchitectures(right)):
+            return left == right
+
+        case let (.noSharedFrameworkSchemes(la, lb), .noSharedFrameworkSchemes(ra, rb)):
+            return la == ra && lb == rb
+
+        case let (.noSharedSchemes(la, lb), .noSharedSchemes(ra, rb)):
+            guard la == ra else { return false }
+
+            switch (lb, rb) {
+            case (nil, nil):
+                return true
+
+            case let ((lb1, lb2)?, (rb1, rb2)?):
+                return lb1 == rb1 && lb2 == rb2
+
+            default:
+                return false
+            }
+
+        case let (.duplicateDependencies(left), .duplicateDependencies(right)):
+            return left.sorted() == right.sorted()
+
+        case let (.gitHubAPIRequestFailed(left), .gitHubAPIRequestFailed(right)):
+            return left == right
+
+        case (.gitHubAPITimeout, .gitHubAPITimeout):
+            return true
+
+        case let (.buildFailed(la, lb), .buildFailed(ra, rb)):
+            return la == ra && lb == rb
+
+        case let (.taskError(left), .taskError(right)):
+            return left == right
+
+        case let (.internalError(left), .internalError(right)):
+            return left == right
+
+        case let (.lockError(left, leftTimeout), .lockError(right, rightTimeout)):
+            return left == right && leftTimeout == rightTimeout
+
+        case let (.duplicatesInArchive(left), .duplicatesInArchive(right)):
+            return left == right
+
+        case let (.incompatibleFrameworkSwiftVersion(left), .incompatibleFrameworkSwiftVersion(right)):
+            return left == right
+
+        case let (.invalidFramework(leftUrl, leftMessage), .invalidFramework(rightUrl, rightMessage)):
+            return leftUrl == rightUrl && leftMessage == rightMessage
+
+        case let (.invalidDebugSymbols(leftUrl, leftMessage), .invalidDebugSymbols(rightUrl, rightMessage)):
+            return leftUrl == rightUrl && leftMessage == rightMessage
+
+        case let (.noInstallableBinariesFoundInArchive(leftDependency), .noInstallableBinariesFoundInArchive(rightDependency)):
+            return leftDependency == rightDependency
+
+        case let (.httpError(leftStatusCode), .httpError(rightStatusCode)):
+            return leftStatusCode == rightStatusCode
+            
+        case (.bootstrapNeeded, .bootstrapNeeded):
+            return true
+
+        default:
+            return false
+        }
+    }
+}
+
+extension CarthageError: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case let .invalidArgument(description):
+            return description
+
+        case let .missingBuildSetting(setting):
+            return "xcodebuild did not return a value for build setting \(setting)"
+
+        case let .readFailed(fileURL, underlyingError):
+            var description = "Failed to read file or folder at \(fileURL.path)"
+
+            if let underlyingError = underlyingError {
+                description += ": \(underlyingError)"
+            }
+
+            return description
+
+        case let .writeFailed(fileURL, underlyingError):
+            var description = "Failed to write to \(fileURL.path)"
+
+            if let underlyingError = underlyingError {
+                description += ": \(underlyingError)"
+            }
+
+            return description
+
+        case let .noAvailableSimulators(platformName):
+            return "Could not find any available simulators for \(platformName)"
+
+        case let .incompatibleRequirements(dependency, first, second):
+            let requirement: (VersionRequirement) -> String = { arg in
+                let (specifier, fromDependency) = arg
+                return "\(specifier)" + (fromDependency.map { " (\($0))" } ?? "")
+            }
+            return "Could not pick a version for \(dependency), due to mutually incompatible requirements:\n\t\(requirement(first))\n\t\(requirement(second))"
+
+        case let .taggedVersionNotFound(dependency):
+            return "No tagged versions found for \(dependency)"
+
+        case let .requiredVersionNotFound(dependency, specifier):
+            return "No available version for \(dependency) satisfies the requirement: \(specifier)"
+
+        case let .unsatisfiableDependencyList(subsetList):
+            let subsetString = subsetList.map { "\t" + $0 }.joined(separator: "\n")
+            return "No valid versions could be found that restrict updates to:\n\(subsetString)"
+
+        case let .repositoryCheckoutFailed(workingDirectoryURL, reason, underlyingError):
+            var description = "Failed to check out repository into \(workingDirectoryURL.path): \(reason)"
+
+            if let underlyingError = underlyingError {
+                description += " (\(underlyingError))"
+            }
+
+            return description
+
+        case let .parseError(description):
+            return "Parse error: \(description)"
+
+        case let .invalidBinaryJSON(url, error):
+            return "Unable to parse binary-only framework JSON at \(url) due to error: \(error)"
+
+        case let .invalidArchitectures(description):
+            return "Invalid architecture: \(description)"
+
+        case let .invalidUUIDs(description):
+            return "Invalid architecture UUIDs: \(description)"
+
+        case let .missingEnvironmentVariable(variable):
+            return "Environment variable not set: \(variable)"
+
+        case let .noSharedFrameworkSchemes(dependency, platforms):
+            var description = "Dependency \"\(dependency.name)\" has no shared framework schemes"
+            if !platforms.isEmpty {
+                let platformsString = platforms.map { $0.rawValue }.joined(separator: ", ")
+                description += " for any of the platforms: \(platformsString)"
+            }
+
+            switch dependency {
+            case let .gitHub(server, repository):
+                description += "\n\nIf you believe this to be an error, please file an issue with the maintainers at \(server.newIssueURL(for: repository).absoluteString)"
+
+            case .git, .binary:
+                break
+            }
+
+            return description
+
+        case let .noSharedSchemes(project, serverAndRepository):
+            var description = "Project \"\(project)\" has no shared schemes"
+            if let (server, repository) = serverAndRepository {
+                description += "\n\nIf you believe this to be an error, please file an issue with the maintainers at \(server.newIssueURL(for: repository).absoluteString)"
+            }
+
+            return description
+
+        case let .xcodebuildTimeout(project):
+            return "xcodebuild timed out while trying to read \(project) 😭"
+
+        case let .duplicateDependencies(duplicateDeps):
+            let deps = duplicateDeps
+                .sorted() // important to match expected order in test cases
+                .map { "\n\t" + $0.description }
+                .joined(separator: "")
+            return "The following dependencies are duplicates:\(deps)"
+
+        case let .dependencyCycle(nodes):
+
+            let prettyGraph = nodes.map({ $0.name }).joined(separator: " -> ")
+            return "The dependency graph contained a cycle:\n\(prettyGraph)"
+
+        case let .gitHubAPIRequestFailed(message):
+            return "GitHub API request failed: \(message)"
+
+        case .gitHubAPITimeout:
+            return "GitHub API timed out"
+
+        case let .unknownDependencies(names):
+            return "No entry found for \(names.count > 1 ? "dependencies" : "dependency") \(names.joined(separator: ", ")) in Cartfile."
+
+        case let .unresolvedDependencies(names):
+            return "No entry found for \(names.count > 1 ? "dependencies" : "dependency") \(names.joined(separator: ", ")) in Cartfile.resolved – "
+                + "please run `carthage update` if the dependency is contained in the project's Cartfile."
+
+        case let .incompatibleDependencies(dependencies):
+            return "No definite resolution could be made for incompatible dependencies [\(dependencies.map { $0.description }.joined(separator: ", "))"
+                + "] - add a definition for exactly one of these dependencies in the project's Cartfile to resolve this."
+
+        case let .buildFailed(taskError, log):
+            var message = "Build Failed\n"
+            if case let .shellTaskFailed(task, exitCode, _) = taskError {
+                message += "\tTask failed with exit code \(exitCode):\n"
+                message += "\t\(task)\n"
+            } else {
+                message += "\t" + taskError.description + "\n"
+            }
+
+            message += "\nThis usually indicates that project itself failed to compile."
+            if let log = log {
+                message += " Please check the xcodebuild log for more details: \(log.path)"
+            }
+
+            return message
+
+        case .unknownFrameworkSwiftVersion(let message):
+            return message
+
+        case let .taskError(taskError):
+            return taskError.description
+
+        case let .internalError(description):
+            return description
+
+        case let .invalidResolvedCartfile(incompatibilities):
+            var message = "The following incompatibilities were found in Cartfile.resolved:\n"
+            message += incompatibilities
+                .sorted { $0.dependency.name < $1.dependency.name }
+                .flatMap { incompatibility -> [String] in
+                    let sortedRequirements = incompatibility
+                        .incompatibleRequirements
+                        .sorted { ($0.0?.name ?? "") < ($1.0?.name ?? "") }
+                    return sortedRequirements.map { dependency, versionSpecifier in
+                        return "* \(incompatibility.dependency.name) \(incompatibility.pinnedVersion) is incompatible with the version constraint specified by \(dependency?.name ?? "\(Constants.Project.cartfilePath)/\(Constants.Project.privateCartfilePath)"): \(versionSpecifier)"
+                    }
+                }
+                .joined(separator: "\n")
+            return message
+
+        case let .lockError(url, timeout):
+            return "Failed to get lock\(timeout.map { "within timeout of \($0)s" } ?? "") for directory: \(url.path)"
+
+        case .incompatibleFrameworkSwiftVersion(let message):
+            return message
+
+        case .invalidFramework(let url, let message):
+            return "Framework at path \(url.path) was invalid: \(message)"
+
+        case .invalidDebugSymbols(let url, let message):
+            return "Debug symbols at path \(url.path) were invalid: \(message)"
+
+        case let .duplicatesInArchive(duplicates):
+            let prettyDupeList = duplicates.dictionary
+                .map { "* \t\($0.value.map { url in return url.absoluteString }.joined(separator: "\n\t")) \n\t\tto:\n\t\($0.key)" }
+                .joined(separator: "\n")
+            return "Invalid archive - Found multiple frameworks with the same unarchiving destination:\n\(prettyDupeList)"
+            
+        case let .noInstallableBinariesFoundInArchive(dependency):
+            return "Could not find any valid .framework or .bundle in the archive for dependency: \(dependency)"
+
+        case let .httpError(statusCode):
+            return "Server returned a non-successful HTTP status: \(statusCode)"
+        
+        case .bootstrapNeeded:
+            return "Bootstrap not yet performed or the checkouts are not up to date with the current Cartfile.resolved. Please run `carthage bootstrap` first."
+        }
+    }
+}
